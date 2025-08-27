@@ -73,6 +73,26 @@
     .count-1 { font-size: 72px; color: green; }
     .count-ya { font-size: 72px; color: blue; }
 
+    .count-muro {
+  font-size: 72px;
+  color: red;
+}
+
+.count-conejo {
+  font-size: 72px;
+  color: purple;
+}
+
+.count-flecha {
+  font-size: 72px;
+  color: green;
+}
+
+.count-ya {
+  font-size: 72px;
+  color: blue;
+}
+
   </style>
 </head>
 <body>
@@ -183,42 +203,45 @@
 
     // Inicia una ronda con conteo regresivo
     function startRound() {
-      document.getElementById('choices').classList.add('hidden');
-      document.getElementById('round-result').classList.add('hidden');
-      document.getElementById('start-round').disabled = true;
-      document.getElementById('start-round').classList.add('hidden');
+  document.getElementById('choices').classList.add('hidden');
+  document.getElementById('round-result').classList.add('hidden');
+  document.getElementById('start-round').disabled = true;
+  document.getElementById('start-round').classList.add('hidden');
 
-      let count = 3;
-      const countdownEl = document.getElementById('countdown');
-      countdownEl.textContent = count;
-      updateCountdownStyle(count);
+  // Palabras que se mostrarán en orden
+  const sequence = ['Muro', 'Conejo', 'Flecha'];
+  let index = 0;
 
-      const interval = setInterval(() => {
-        count--;
-        if (count === 0) {
-          clearInterval(interval);
-          countdownEl.textContent = '¡Ya!';
-          updateCountdownStyle('ya');
-          document.getElementById('choices').classList.remove('hidden');
-        } else {
-          countdownEl.textContent = count;
-          updateCountdownStyle(count);
-        }
-      }, 750);
+  const countdownEl = document.getElementById('countdown');
+  countdownEl.textContent = sequence[index];
+  updateCountdownStyle(sequence[index].toLowerCase());
+
+  const interval = setInterval(() => {
+    index++;
+    if (index === sequence.length) {
+      clearInterval(interval);
+      countdownEl.textContent = '¡Ya!';
+      updateCountdownStyle('ya');
+      document.getElementById('choices').classList.remove('hidden');
+    } else {
+      countdownEl.textContent = sequence[index];
+      updateCountdownStyle(sequence[index].toLowerCase());
     }
+  }, 700);
+}
 
     // Aplica estilos visuales al conteo
-    function updateCountdownStyle(count) {
-      const countdownEl = document.getElementById('countdown');
-      countdownEl.className = ''; // Limpia clases anteriores
+   function updateCountdownStyle(label) {
+  const countdownEl = document.getElementById('countdown');
+  countdownEl.className = ''; // Limpia clases anteriores
 
-      switch (count) {
-        case 3: countdownEl.classList.add('count-3'); break;
-        case 2: countdownEl.classList.add('count-2'); break;
-        case 1: countdownEl.classList.add('count-1'); break;
-        case 'ya': countdownEl.classList.add('count-ya'); break;
-      }
-    }
+  switch (label) {
+    case 'muro': countdownEl.classList.add('count-muro'); break;
+    case 'conejo': countdownEl.classList.add('count-conejo'); break;
+    case 'flecha': countdownEl.classList.add('count-flecha'); break;
+    case 'ya': countdownEl.classList.add('count-ya'); break;
+  }
+}
 
     // Lógica de selección del jugador
     function playerSelect(choice) {
