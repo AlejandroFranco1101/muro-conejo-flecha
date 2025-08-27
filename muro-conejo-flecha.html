@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Muro, Conejo o Flecha</title>
+  <style>
+    /* --- Estilos generales --- */
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+      text-align: center;
+      padding: 20px;
+      font-size: 20px;
+    }
+
+    h1 {
+      font-size: 3em; /* Título grande */
+    }
+
+    h2 {
+      font-size: 2em;
+    }
+
+    .hidden {
+      display: none; /* Clase para ocultar elementos */
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    img {
+      width: 100px;
+      height: 100px;
+      object-fit: contain;
+      margin: 10px;
+    }
+
+    .choices img {
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .choices img:hover {
+      transform: scale(1.1); /* Efecto de zoom al pasar el cursor */
+    }
+
+    table {
+      margin: 20px auto;
+      border-collapse: collapse;
+      width: 80%;
+    }
+
+    th, td {
+      padding: 10px;
+      border: 1px solid #ccc;
+    }
+
+    /* --- Estilo para el conteo regresivo --- */
+    #countdown {
+      font-size: 24px;
+      margin: 20px;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+
+    .count-3 { font-size: 72px; color: red; }
+    .count-2 { font-size: 72px; color: orange; }
+    .count-1 { font-size: 72px; color: green; }
+    .count-ya { font-size: 72px; color: blue; }
+
+  </style>
+</head>
+<body>
+
+  <!-- Menú principal -->
+  <div id="menu">
+    <h1>¡Muro, Conejo o Flecha!</h1>
+    <button onclick="startGame()">Jugar</button>
+    <button onclick="exitGame()">Salir</button>
+  </div>
+
+  <!-- Sección de juego -->
+  <div id="game" class="hidden">
+    <h2>Ronda <span id="round-number">1</span> de 5</h2>
+    <div id="countdown">Preparados...</div>
+
+    <!-- Opciones de elección -->
+    <div class="choices hidden" id="choices">
+      <img src="muro.png" alt="Muro" onclick="playerSelect('muro')">
+      <img src="conejo.png" alt="Conejo" onclick="playerSelect('conejo')">
+      <img src="flecha.png" alt="Flecha" onclick="playerSelect('flecha')">
+    </div>
+
+    <!-- Resultado de la ronda -->
+    <div class="result-images hidden" id="round-result">
+      <p id="round-text"></p>
+      <img id="player-img" src="">
+      <img id="cpu-img" src="">
+    </div>
+
+    <button id="start-round" onclick="startRound()">Comenzar Ronda</button>
+  </div>
+
+  <!-- Tabla de resultados -->
+  <div id="results" class="hidden">
+    <h2>Tabla de Resultados</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Ronda</th>
+          <th>Jugador</th>
+          <th>CPU</th>
+          <th>Ganador</th>
+        </tr>
+      </thead>
+      <tbody id="results-body"></tbody>
+    </table>
+    <h3 id="final-winner"></h3>
+    <button onclick="startGame()">Volver a jugar</button>
+    <button onclick="goToMenu()">Regresar al menú</button>
+  </div>
+
+  <script>
+    // Opciones disponibles
+    const options = ['muro', 'conejo', 'flecha'];
+
+    // Rutas locales de imágenes
+    const images = {
+      muro: 'muro.png',
+      conejo: 'conejo.png',
+      flecha: 'flecha.png'
+    };
+
+    // Variables del juego
+    let currentRound = 1;
+    let playerScore = 0;
+    let cpuScore = 0;
+    let results = [];
+
+    // Inicia el juego desde el menú
+    function startGame() {
+      document.getElementById('menu').classList.add('hidden');
+      document.getElementById('results').classList.add('hidden');
+      document.getElementById('game').classList.remove('hidden');
+      reset();
+    }
+
+    // Simula salir del juego (no puede cerrar ventana por seguridad del navegador)
+    function exitGame() {
+      alert('Gracias por jugar. ¡Hasta la próxima!');
+      
+    }
+
+    // Vuelve al menú principal
+    function goToMenu() {
+      document.getElementById('results').classList.add('hidden');
+      document.getElementById('menu').classList.remove('hidden');
+    }
+
+    // Reinicia los datos del juego
+    function reset() {
+      currentRound = 1;
+      playerScore = 0;
+      cpuScore = 0;
+      results = [];
+
+      document.getElementById('results-body').innerHTML = '';
+      document.getElementById('round-number').textContent = currentRound;
+      document.getElementById('round-result').classList.add('hidden');
+      document.getElementById('choices').classList.add('hidden');
+      document.getElementById('start-round').disabled = false;
+      document.getElementById('start-round').classList.remove('hidden');
+
+      const countdownEl = document.getElementById('countdown');
+      countdownEl.textContent = 'Preparados...';
+      countdownEl.className = '';
+    }
+
+    // Inicia una ronda con conteo regresivo
+    function startRound() {
+      document.getElementById('choices').classList.add('hidden');
+      document.getElementById('round-result').classList.add('hidden');
+      document.getElementById('start-round').disabled = true;
+      document.getElementById('start-round').classList.add('hidden');
+
+      let count = 3;
+      const countdownEl = document.getElementById('countdown');
+      countdownEl.textContent = count;
+      updateCountdownStyle(count);
+
+      const interval = setInterval(() => {
+        count--;
+        if (count === 0) {
+          clearInterval(interval);
+          countdownEl.textContent = '¡Ya!';
+          updateCountdownStyle('ya');
+          document.getElementById('choices').classList.remove('hidden');
+        } else {
+          countdownEl.textContent = count;
+          updateCountdownStyle(count);
+        }
+      }, 1000);
+    }
+
+    // Aplica estilos visuales al conteo
+    function updateCountdownStyle(count) {
+      const countdownEl = document.getElementById('countdown');
+      countdownEl.className = ''; // Limpia clases anteriores
+
+      switch (count) {
+        case 3: countdownEl.classList.add('count-3'); break;
+        case 2: countdownEl.classList.add('count-2'); break;
+        case 1: countdownEl.classList.add('count-1'); break;
+        case 'ya': countdownEl.classList.add('count-ya'); break;
+      }
+    }
+
+    // Lógica de selección del jugador
+    function playerSelect(choice) {
+      const cpuChoice = options[Math.floor(Math.random() * 3)];
+      let winner = 'Empate';
+
+      // Reglas de juego
+      if (choice !== cpuChoice) {
+        if (
+          (choice === 'muro' && cpuChoice === 'flecha') ||
+          (choice === 'conejo' && cpuChoice === 'muro') ||
+          (choice === 'flecha' && cpuChoice === 'conejo')
+        ) {
+          playerScore++;
+          winner = 'Jugador';
+        } else {
+          cpuScore++;
+          winner = 'CPU';
+        }
+      }
+
+      // Guarda el resultado
+      results.push({ round: currentRound, player: choice, cpu: cpuChoice, winner });
+      showRoundResult(choice, cpuChoice, winner);
+
+      // Avanza o termina el juego
+      if (currentRound === 5) {
+        setTimeout(showResults, 1500);
+      } else {
+        currentRound++;
+        document.getElementById('round-number').textContent = currentRound;
+        setTimeout(() => {
+          document.getElementById('start-round').classList.remove('hidden');
+          document.getElementById('start-round').disabled = false;
+        }, 1500);
+      }
+    }
+
+    // Muestra resultado de la ronda
+    function showRoundResult(player, cpu, winner) {
+      document.getElementById('player-img').src = images[player];
+      document.getElementById('cpu-img').src = images[cpu];
+      document.getElementById('round-text').textContent = `Ganador de la ronda: ${winner}`;
+      document.getElementById('round-result').classList.remove('hidden');
+      document.getElementById('choices').classList.add('hidden');
+    }
+
+    // Muestra tabla final de resultados
+    function showResults() {
+      document.getElementById('game').classList.add('hidden');
+      document.getElementById('results').classList.remove('hidden');
+
+      const tbody = document.getElementById('results-body');
+      tbody.innerHTML = '';
+
+      results.forEach((res, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${index + 1}</td>
+          <td>${res.player}</td>
+          <td>${res.cpu}</td>
+          <td>${res.winner}</td>
+        `;
+        tbody.appendChild(row);
+      });
+
+      const final = playerScore > cpuScore ? '¡Ganaste!' :
+                    playerScore < cpuScore ? 'Perdiste.' : 'Empate.';
+      document.getElementById('final-winner').textContent = `Resultado final: ${final}`;
+    }
+  </script>
+</body>
+</html>
