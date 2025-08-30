@@ -7,19 +7,39 @@
   <style>
     /* --- Estilos generales --- */
     body {
-      font-family: Arial, sans-serif;
-      background: #5d1c1c;
+      font-family: sans-serif;
+      background: #314B6E;
       text-align: center;
+      color: #fff;
       padding: 20px;
       font-size: 20px;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+/* Contenedor principal */
+    #contenedor {
+      background:#0E141C;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+      max-width: 700px;
+      width: 100%;
     }
 
+
     h1 {
-      font-size: 3em; /* Título grande */
+      font-size: 2em; /* Título grande */
+      margin-bottom: 15px;
+      text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
+      color: #fdffff;
     }
 
     h2 {
       font-size: 2em;
+      margin-bottom: 10px;
+      color: #fdffff;
     }
 
     .hidden {
@@ -27,11 +47,22 @@
     }
 
     button {
-      padding: 10px 20px;
+      padding: 12px 25px;
       margin: 10px;
-      font-size: 16px;
+      font-size: 18px;
+      font-weight: bold;
       cursor: pointer;
+      border: none;
+      border-radius: 30px;
+      background:#A68868;
+      color: #fff;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      transition: transform 0.2s, background 0.4s;
     }
+    button:hover {
+      transform: scale(1.1);
+      background: #E3C39D;
+}
 
     img {
       width: 100px;
@@ -43,21 +74,46 @@
     .choices img {
       cursor: pointer;
       transition: transform 0.2s;
+      width: 120px;
+      height: 120px;
+      margin: 15px;
+      border-radius: 15px;
+      background:#8197AC;
+      padding: 10px;
+      transition: transform 0.2s, box-shadow 0.3s;
     }
 
     .choices img:hover {
       transform: scale(1.1); /* Efecto de zoom al pasar el cursor */
+      box-shadow: 0 0 25px rgba(129, 141, 196, 0.8);
     }
 
     table {
       margin: 20px auto;
       border-collapse: collapse;
-      width: 80%;
+      width: 90%;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      overflow: hidden;
     }
 
     th, td {
-      padding: 10px;
-      border: 1px solid #ccc;
+      padding: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+      text-align: center;
+    }
+
+    th {
+    background: rgba(0,0,0,0.4);
+    color: #ffd166;
+}
+    /* Resultado final */
+    #final-winner {
+      font-size: 1.8em;
+      margin-top: 20px;
+      font-weight: bold;
+      color: #06d6a0;
+      text-shadow: 0 0 10px rgba(0,0,0,0.6);
     }
 
     /* --- Estilo para el conteo regresivo --- */
@@ -66,6 +122,7 @@
       margin: 20px;
       font-weight: bold;
       transition: all 0.3s ease;
+      text-shadow: 2px 2px 8px rgba(0,0,0,0.6);
     }
 
     .count-3 { font-size: 72px; color: red; }
@@ -98,6 +155,7 @@
 <body>
 
   <!-- Menú principal -->
+   <section id="contenedor">
   <div id="menu">
     <h1>¡Muro, Conejo o Flecha!</h1>
     <button onclick="startGame()">Jugar</button>
@@ -144,7 +202,7 @@
     <button onclick="startGame()">Volver a jugar</button>
     <button onclick="goToMenu()">Regresar al menú</button>
   </div>
-
+</section>
   <script>
     // Opciones disponibles
     const options = ['muro', 'conejo', 'flecha'];
@@ -272,6 +330,7 @@
         setTimeout(showResults, 1500);
       } else {
         currentRound++;
+         updateBackground(currentRound);
         document.getElementById('round-number').textContent = currentRound;
         setTimeout(() => {
           document.getElementById('start-round').classList.remove('hidden');
@@ -312,6 +371,24 @@
                     playerScore < cpuScore ? 'Perdiste.' : 'Empate.';
       document.getElementById('final-winner').textContent = `Resultado final: ${final}`;
     }
+    // Colores/degradados para cada ronda
+const roundBackgrounds = [
+  "linear-gradient(135deg, #1a2a6c, #b21f1f)",   // Ronda 1
+  "linear-gradient(135deg, #0f2027, #203a43, #2c5364)", // Ronda 2
+  "linear-gradient(135deg, #42275a, #734b6d)",   // Ronda 3
+  "linear-gradient(135deg, #ff9966, #ff5e62)",   // Ronda 4
+  "linear-gradient(135deg, #11998e, #38ef7d)"    // Ronda 5
+];
+
+// Cambia el fondo según la ronda
+function updateBackground(round) {
+  const body = document.body;
+  const index = (round - 1) % roundBackgrounds.length; // Reutiliza si pasan más de 5 rondas
+  body.style.background = roundBackgrounds[index];
+  body.style.backgroundSize = "cover";
+  body.style.transition = "background 1s ease-in-out";
+}
+
   </script>
 </body>
 </html>
